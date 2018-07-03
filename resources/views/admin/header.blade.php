@@ -28,7 +28,7 @@
           </a>
 		</li>
 
-          <li><a href="{{route('products')}}">
+          <li><a href="{{route('productsIndex')}}">
                   <h5>Продукты</h5>
               </a>
           </li>

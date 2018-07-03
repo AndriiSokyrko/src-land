@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Product;
+use Validator;
 
 class ProductController extends Controller
 {
@@ -16,19 +17,15 @@ class ProductController extends Controller
      */
     public function index()
     {
-        if(view()->exists('admin.pages')) {
+        if(view()->exists('admin.products')) {
 
             $products = \App\Product::all();
 
             $data = [
-
                 'title' => 'Продукты',
-                'pages' => $products
-
+                'products' => $products
             ];
-
             return view('admin.products',$data);
-
         }
 
         abort(404);
@@ -41,7 +38,22 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+//        $request = new Request();
+//        if($request->isMethod('POST'))
+
+        if(view()->exists('admin.products_add')) {
+            $data = [
+
+                'title' => 'Добавить продукт'
+
+            ];
+            return view('admin.products_add',$data);
+
+        }
+
+        abort(404);
+
+
     }
 
     /**
@@ -52,8 +64,52 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->except('_token');
+
+        $massages = [
+            'required'=>'Поле :attribute обязательно к заполнению',
+            'unique'=>'Поле :attribute должно быть уникальным'
+
+        ];
+
+
+        $validator = Validator::make($input,[
+
+            'name' => 'required|max:255',
+            'date_start' => 'required',
+            'date_end' => 'required',
+            'price' => 'required|max:255',
+            'alias' => 'required|unique:pages|max:255',
+            'text'=> 'required'
+
+        ], $massages);
+
+        if($validator->fails()) {
+            return redirect()->route('productsAdd')->withErrors($validator)->withInput();
+        }
+
+        if($request->hasFile('images')) {
+            $file = $request->file('images');
+
+            $input['images'] = $file->getClientOriginalName();
+
+            $file->move(public_path().'/assets/img',$input['images']);
+
+        }
+
+        $product = new Product();
+
+
+        //$page->unguard();
+
+        $product->fill($input);
+
+        if($product->save()) {
+            return redirect('admin')->with('status','Продукт добавлен');
+        }
+
     }
+
 
     /**
      * Display the specified resource.

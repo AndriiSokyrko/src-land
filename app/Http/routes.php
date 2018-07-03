@@ -89,8 +89,28 @@ Route::group(['prefix'=>'admin','middleware'=>'auth'], function() {
 //	//menus
 	Route::resource('/products','ProductController',[
 		'names' => [
-			'index'=>'products'
+			'index'=>'productsIndex'
 		]
+	]);
+	Route::resource('/products/create','ProductController',[
+		'names' => [
+			'create'=>'productsAdd'
+		]
+	]);
+	Route::resource('/products/{product}/edit','ProductController',[
+		'names' => [
+			'edit'=>'productsEdit'
+		]
+	]);
+	Route::resource('/product','ProductController',[
+		'names' => [
+			'store'=>'productStore'
+		]
+	]);
+		Route::resource('/product/(product)','ProductController',[
+			'names' => [
+				'store'=>'productDestroy'
+			]
 	]);
 
 
